@@ -1,87 +1,103 @@
-import { ProductCard, ProductCardSkeleton } from "@/components/ProductCard"
-import { Button } from "@/components/ui/button"
-import db from "@/db/db"
-import { cache } from "@/lib/cache"
-import { Product } from "@prisma/client"
-import { ArrowRight } from "lucide-react"
-import Link from "next/link"
-import { Suspense } from "react"
+import { ProductCard, ProductCardSkeleton } from '@/components/ProductCard';
+import VideoPlayer from '@/components/VideoPlayer';
+import db from '@/db/db';
+import { cache } from '@/lib/cache';
+import { Collection, Product } from '@prisma/client';
+import { Suspense } from 'react';
 
-const getMostPopularProducts = cache(
-  () => {
-    return db.product.findMany({
-      where: { isAvailable: true },
-      orderBy: { orders: { _count: "desc" } },
-      take: 6,
-    })
-  },
-  ["/", "getMostPopularProducts"],
-  { revalidate: 60 * 60 * 24 }
-)
+// Fetch and cache the latest collection for use on the homepage
+const getLatestCollection = cache(async () => {
+	return await db.collection.findFirst({
+		where: { isAvailable: true },
+		orderBy: { createdAt: 'desc' },
+	});
+}, ['/', 'getLatestCollection']);
 
-const getNewestProducts = cache(() => {
-  return db.product.findMany({
-    where: { isAvailable: true },
-    orderBy: { createdAt: "desc" },
-    take: 6,
-  })
-}, ["/", "getNewestProducts"])
+// Fetch and cache the newest products from the latest collection
+const getNewestProducts = cache(async () => {
+	const latestCollection = await getLatestCollection();
+
+	// If there's no available collection, return an empty array
+	if (!latestCollection) return [];
+
+	return db.product.findMany({
+		where: {
+			isAvailable: true,
+			collectionId: latestCollection.id,
+		},
+		orderBy: { createdAt: 'desc' },
+	});
+}, ['/', 'getNewestProducts']);
 
 export default function HomePage() {
-  return (
-    <main className="space-y-12">
-      <ProductGridSection
-        title="Most Popular"
-        productsFetcher={getMostPopularProducts}
-      />
-      <ProductGridSection title="Newest" productsFetcher={getNewestProducts} />
-    </main>
-  )
+	return (
+		<main className='space-y-12'>
+			<CollectionHeaderSection collectionFetcher={getLatestCollection} />
+			<ProductGridSection
+				title='Newest'
+				productsFetcher={getNewestProducts}
+			/>
+		</main>
+	);
+}
+
+type CollectionHeaderSectionProps = {
+	collectionFetcher: () => Promise<Collection | null>;
+};
+
+async function CollectionHeaderSection({
+	collectionFetcher,
+}: Readonly<CollectionHeaderSectionProps>) {
+	const collection = await collectionFetcher();
+
+	// Display a fallback message if there’s no available collection
+	if (!collection) {
+		return <div>No collection available at the moment.</div>;
+	}
+
+	return (
+		<section className='collection-header'>
+			<VideoPlayer collectionName={collection.name} videoPath={collection.videoPath} />
+			<p>{collection.title}</p>
+			<p>{collection.description}</p>
+		</section>
+	);
 }
 
 type ProductGridSectionProps = {
-  title: string
-  productsFetcher: () => Promise<Product[]>
-}
+	title: string;
+	productsFetcher: () => Promise<Product[]>;
+};
 
 function ProductGridSection({
-  productsFetcher,
-  title,
+	productsFetcher,
+	title,
 }: Readonly<ProductGridSectionProps>) {
-  return (
-    <div className="space-y-4">
-      <div className="flex gap-4">
-        <h2 className="text-3xl font-bold">{title}</h2>
-        <Button variant="outline" asChild>
-          <Link href="/products" className="space-x-2">
-            <span>View All</span>
-            <ArrowRight className="size-4" />
-          </Link>
-        </Button>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <Suspense
-          fallback={
-            <>
-              <ProductCardSkeleton />
-              <ProductCardSkeleton />
-              <ProductCardSkeleton />
-            </>
-          }
-        >
-          <ProductSuspense productsFetcher={productsFetcher} />
-        </Suspense>
-      </div>
-    </div>
-  )
+	return (
+		<div className='space-y-4'>
+			<div className='grid grid-cols-1 gap-10'>
+				<Suspense
+					fallback={
+						<>
+							<ProductCardSkeleton />
+							<ProductCardSkeleton />
+							<ProductCardSkeleton />
+						</>
+					}
+				>
+				</Suspense>
+					<ProductSuspense productsFetcher={productsFetcher} />
+			</div>
+		</div>
+	);
 }
 
 async function ProductSuspense({
-  productsFetcher,
+	productsFetcher,
 }: {
-  productsFetcher: () => Promise<Product[]>
+	productsFetcher: () => Promise<Product[]>;
 }) {
-  return (await productsFetcher()).map(product => (
-    <ProductCard key={product.id} {...product} />
-  ))
+	return (await productsFetcher()).map((product) => (
+		<ProductCard key={product.id} {...product} />
+	));
 }
