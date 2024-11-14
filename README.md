@@ -1,12 +1,11 @@
-# In Local
+# In developement
 
-## Start npm
+### Start npm
 ```bash
 npm run dev
 ```
 
-## Start stripe
+### Start stripe
 ```bash
 stripe listen --forward-to localhost:3000/webhooks/stripe
 ```
-
