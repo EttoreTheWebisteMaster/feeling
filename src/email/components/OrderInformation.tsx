@@ -1,6 +1,5 @@
 import { formatCurrency } from "@/lib/formatters"
 import {
-  Button,
   Column,
   Img,
   Row,
@@ -11,7 +10,6 @@ import {
 type OrderInformationProps = {
   order: { id: string; createdAt: Date; pricePaidInCents: number }
   product: { imagePath: string; name: string; description: string }
-  downloadVerificationId: string
 }
 
 const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium" })
@@ -19,8 +17,7 @@ const dateFormatter = new Intl.DateTimeFormat("en", { dateStyle: "medium" })
 export function OrderInformation({
   order,
   product,
-  downloadVerificationId,
-}: OrderInformationProps) {
+}: Readonly<OrderInformationProps>) {
   return (
     <>
       <Section>
@@ -58,14 +55,6 @@ export function OrderInformation({
         <Row className="mt-8">
           <Column className="align-bottom">
             <Text className="text-lg font-bold m-0 mr-4">{product.name}</Text>
-          </Column>
-          <Column align="right">
-            <Button
-              href={`${process.env.NEXT_PUBLIC_SERVER_URL}/products/download/${downloadVerificationId}`}
-              className="bg-black text-white px-6 py-4 rounded text-lg"
-            >
-              Download
-            </Button>
           </Column>
         </Row>
         <Row>

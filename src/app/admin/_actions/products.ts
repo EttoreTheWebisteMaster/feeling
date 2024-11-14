@@ -15,6 +15,7 @@ const addSchema = z.object({
 	name: z.string().min(1),
 	description: z.string().min(1),
 	priceInCents: z.coerce.number().int().min(1),
+	collectionId: z.string().optional(),
 	image: imageSchema.refine((file) => file.size > 0, 'Required'),
 });
 
@@ -25,6 +26,8 @@ export async function addProduct(prevState: unknown, formData: FormData) {
 	}
 
 	const data = result.data;
+
+	console.log(data)
 
 	await fs.mkdir('public/products', { recursive: true });
 	const imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`;
@@ -39,6 +42,7 @@ export async function addProduct(prevState: unknown, formData: FormData) {
 			name: data.name,
 			description: data.description,
 			priceInCents: data.priceInCents,
+			collectionId: data.collectionId,
 			imagePath,
 			imagePath1: '',
 			imagePath2: '',
@@ -89,6 +93,7 @@ export async function updateProduct(
 			name: data.name,
 			description: data.description,
 			priceInCents: data.priceInCents,
+			collectionId: data.collectionId,
 			imagePath,
 		},
 	});

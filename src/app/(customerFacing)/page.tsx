@@ -47,7 +47,7 @@ type ProductGridSectionProps = {
 function ProductGridSection({
   productsFetcher,
   title,
-}: ProductGridSectionProps) {
+}: Readonly<ProductGridSectionProps>) {
   return (
     <div className="space-y-4">
       <div className="flex gap-4">

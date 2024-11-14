@@ -16,7 +16,6 @@ type PurchaseReceiptEmailProps = {
     description: string
   }
   order: { id: string; createdAt: Date; pricePaidInCents: number }
-  downloadVerificationId: string
 }
 
 PurchaseReceiptEmail.PreviewProps = {
@@ -31,14 +30,12 @@ PurchaseReceiptEmail.PreviewProps = {
     createdAt: new Date(),
     pricePaidInCents: 10000,
   },
-  downloadVerificationId: crypto.randomUUID(),
 } satisfies PurchaseReceiptEmailProps
 
 export default function PurchaseReceiptEmail({
   product,
   order,
-  downloadVerificationId,
-}: PurchaseReceiptEmailProps) {
+}: Readonly<PurchaseReceiptEmailProps>) {
   return (
     <Html>
       <Preview>Download {product.name} and view receipt</Preview>
@@ -50,7 +47,6 @@ export default function PurchaseReceiptEmail({
             <OrderInformation
               order={order}
               product={product}
-              downloadVerificationId={downloadVerificationId}
             />
           </Container>
         </Body>

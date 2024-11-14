@@ -16,7 +16,6 @@ type OrderHistoryEmailProps = {
     id: string
     pricePaidInCents: number
     createdAt: Date
-    downloadVerificationId: string
     product: {
       name: string
       imagePath: string
@@ -31,7 +30,6 @@ OrderHistoryEmail.PreviewProps = {
       id: crypto.randomUUID(),
       createdAt: new Date(),
       pricePaidInCents: 10000,
-      downloadVerificationId: crypto.randomUUID(),
       product: {
         name: "Product name",
         description: "Some description",
@@ -43,7 +41,6 @@ OrderHistoryEmail.PreviewProps = {
       id: crypto.randomUUID(),
       createdAt: new Date(),
       pricePaidInCents: 2000,
-      downloadVerificationId: crypto.randomUUID(),
       product: {
         name: "Product name 2",
         description: "Some other desc",
@@ -54,7 +51,7 @@ OrderHistoryEmail.PreviewProps = {
   ],
 } satisfies OrderHistoryEmailProps
 
-export default function OrderHistoryEmail({ orders }: OrderHistoryEmailProps) {
+export default function OrderHistoryEmail({ orders }: Readonly<OrderHistoryEmailProps>) {
   return (
     <Html>
       <Preview>Order History & Downloads</Preview>
@@ -68,7 +65,6 @@ export default function OrderHistoryEmail({ orders }: OrderHistoryEmailProps) {
                 <OrderInformation
                   order={order}
                   product={order.product}
-                  downloadVerificationId={order.downloadVerificationId}
                 />
                 {index < orders.length - 1 && <Hr />}
               </React.Fragment>
