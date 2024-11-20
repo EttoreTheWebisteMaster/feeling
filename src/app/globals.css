@@ -74,3 +74,29 @@
     @apply bg-background text-foreground;
   }
 }
+
+@font-face {
+  font-family: "Afacad";
+  src: url("/fonts/Afacad-Regular.woff2") format("woff2"),
+       url("/fonts/Afacad-Regular.woff") format("woff"),
+       url("/fonts/Afacad-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "BlackHanSans";
+  src: url("/fonts/BlackHanSans-Regular.woff2") format("woff2"),
+       url("/fonts/BlackHanSans-Regular.woff") format("woff"),
+       url("/fonts/BlackHanSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+html {
+  font-family: "Afacad", sans-serif;
+}
+
+.bigText {
+  font-family: "BlackHanSans", sans-serif;
+}
