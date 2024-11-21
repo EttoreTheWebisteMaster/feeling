@@ -1,4 +1,3 @@
-import { formatCurrency } from '@/lib/formatters';
 import {
 	Card,
 	CardContent,
@@ -10,6 +9,7 @@ import {
 import { Button } from './ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
+import ElegantButton from './ElegantButton';
 
 type ProductCardProps = {
 	id: string;
@@ -27,21 +27,28 @@ export function ProductCard({
 	imagePath,
 }: Readonly<ProductCardProps>) {
 	return (
-		<Link href={`/products/${id}/purchase`}>
-			<Card className='flex overflow-hidden flex-col relative'>
-				<div className='relative w-96 h-96'>
-					<Image
-						src={imagePath}
-						fill
-						alt={name}
-						className='object-contain'
-					/>
+		<div className='flex justify-center'>
+			<Link
+				href={`/products/${id}/purchase`}
+				className='relative w-full h-96'
+			>
+				<Image
+					src={imagePath}
+					fill
+					alt={name}
+					className='object-cover w-full h-96'
+				/>
+				<div
+					className='absolute text-white w-full'
+					style={{ bottom: '24px' }}
+				>
+					<div className='uppercase text-6xl drop-shadow-md bigText'>
+						{name}
+					</div>
+					<ElegantButton text='Order now' />
 				</div>
-				<CardTitle className='absolute bottom-0 left-0 uppercase text-5xl text-white'>
-					{name}
-				</CardTitle>
-			</Card>
-		</Link>
+			</Link>
+		</div>
 	);
 }
 

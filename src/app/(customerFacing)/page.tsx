@@ -1,3 +1,4 @@
+import PastCollections from '@/components/PastCollections';
 import { ProductCard, ProductCardSkeleton } from '@/components/ProductCard';
 import VideoPlayer from '@/components/VideoPlayer';
 import db from '@/db/db';
@@ -34,9 +35,11 @@ export default function HomePage() {
 		<main className='space-y-12'>
 			<CollectionHeaderSection collectionFetcher={getLatestCollection} />
 			<ProductGridSection
-				title='Newest'
+				title='Newest products'
 				productsFetcher={getNewestProducts}
 			/>
+			{/* TODO in future */}
+			{/* <PastCollections /> */}
 		</main>
 	);
 }
@@ -57,9 +60,7 @@ async function CollectionHeaderSection({
 
 	return (
 		<section className='collection-header'>
-			<VideoPlayer collectionName={collection.name} videoPath={collection.videoPath} />
-			<p>{collection.title}</p>
-			<p>{collection.description}</p>
+			<VideoPlayer collection={collection} videoPath={collection.videoPath} />
 		</section>
 	);
 }
@@ -75,7 +76,7 @@ function ProductGridSection({
 }: Readonly<ProductGridSectionProps>) {
 	return (
 		<div className='space-y-4'>
-			<div className='grid grid-cols-1 gap-10'>
+			<div className='grid grid-cols-1 gap-3 px-2'>
 				<Suspense
 					fallback={
 						<>
