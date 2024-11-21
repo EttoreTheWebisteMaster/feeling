@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  engineType = "binary" // Use binary engine for Vercel compatibility
 }
 
 datasource db {
