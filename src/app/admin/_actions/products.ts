@@ -4,145 +4,144 @@ import db from '@/db/db';
 import { z } from 'zod';
 import { notFound, redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { del, put } from '@vercel/blob'; // Ensure correct import
+import { put, del } from '@vercel/blob'; // Import Vercel Blob helpers
 
-const fileSchema = z.instanceof(File, { message: 'Required' });
+// File schema for handling image uploads
+const fileSchema = z.instanceof(File, { message: 'File is required' });
 const imageSchema = fileSchema.refine(
-	(file) => file.size === 0 || file.type.startsWith('image/')
+	(file) => file.size > 0 && file.type.startsWith('image/'),
+	{ message: 'File must be a non-empty image' }
 );
 
-const addSchema = z.object({
+// Validation schema for new product data
+const addProductSchema = z.object({
 	name: z.string().min(1),
 	description: z.string().min(1),
-	priceInCents: z.coerce.number().int().min(1),
-	collectionId: z.string().optional(),
-	image: imageSchema.refine((file) => file.size > 0, 'Required'),
+	priceInCents: z.number().positive(),
+	image: imageSchema, // Image file validation
 });
 
+// Add a new product
 export async function addProduct(prevState: unknown, formData: FormData) {
-	const result = addSchema.safeParse(Object.fromEntries(formData.entries()));
-	if (result.success === false) {
+	const result = addProductSchema.safeParse(
+		Object.fromEntries(formData.entries())
+	);
+	if (!result.success) {
 		return result.error.formErrors.fieldErrors;
 	}
 
 	const data = result.data;
 
-	// Generate unique image path
-	const imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`;
+	// Define unique blob key for the image
+	const imageKey = `products/${crypto.randomUUID()}-${data.image.name}`;
 
-	// Upload the image to Blob Storage
-	await put(imagePath, data.image.stream(), {
+	// Upload image to Vercel Blob Storage
+	const arrayBuffer = await data.image.arrayBuffer();
+	const uint8Array = new Uint8Array(arrayBuffer);
+
+	const { url: imageUrl } = await put(imageKey, uint8Array, {
 		access: 'public',
-		token: process.env.BLOB_READ_WRITE_TOKEN,
+		token: process.env.BLOB_READ_WRITE_TOKEN, // Use the blob token for authentication
 	});
 
-	// Store product in the database
+	// Create product in the database
 	await db.product.create({
 		data: {
-			isAvailable: false,
-			isSoldOut: false,
 			name: data.name,
 			description: data.description,
 			priceInCents: data.priceInCents,
-			collectionId: data.collectionId,
-			imagePath,
+			imagePath: imageUrl, // Save blob URL instead of a file path
 			imagePath1: '',
 			imagePath2: '',
 			imagePath3: '',
 			imagePath4: '',
 			imagePath5: '',
-		} as any,
+		},
 	});
 
-	// Revalidate paths and redirect
 	revalidatePath('/');
 	revalidatePath('/products');
+
+	// Redirect to the products admin page
 	redirect('/admin/products');
 }
 
-const editSchema = addSchema.extend({
-	file: fileSchema.optional(),
+// Schema for updating a product
+const editProductSchema = addProductSchema.extend({
 	image: imageSchema.optional(),
 });
 
+// Update an existing product
 export async function updateProduct(
 	id: string,
 	prevState: unknown,
 	formData: FormData
 ) {
-	const result = editSchema.safeParse(Object.fromEntries(formData.entries()));
-	if (result.success === false) {
+	const result = editProductSchema.safeParse(
+		Object.fromEntries(formData.entries())
+	);
+	if (!result.success) {
 		return result.error.formErrors.fieldErrors;
 	}
 
 	const data = result.data;
+
+	// Fetch existing product
 	const product = await db.product.findUnique({ where: { id } });
+	if (!product) return notFound();
 
-	if (product == null) return notFound();
+	let imageUrl = product.imagePath;
 
-	let imagePath = product.imagePath;
+	// Check if new image file is uploaded
+	if (data.image) {
+		// Delete the old image from blob storage
+		await del(product.imagePath, {
+			token: process.env.BLOB_READ_WRITE_TOKEN, // Authenticate deletion
+		});
 
-	// Update the image if a new one is provided
-	if (data.image != null && data.image.size > 0) {
-		// Delete old image from Blob Storage
-		await deleteBlob(product.imagePath);
+		// Upload new image to blob storage
+		const newImageKey = `products/${crypto.randomUUID()}-${
+			data.image.name
+		}`;
+		const arrayBuffer = await data.image.arrayBuffer();
+		const uint8Array = new Uint8Array(arrayBuffer);
 
-		// Upload the new image to Blob Storage
-		imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`;
-		await put(imagePath, data.image.stream(), {
+		const { url } = await put(newImageKey, uint8Array, {
 			access: 'public',
 			token: process.env.BLOB_READ_WRITE_TOKEN,
 		});
+
+		imageUrl = url; // Update image URL
 	}
 
-	// Update the product in the database
+	// Update product in the database
 	await db.product.update({
 		where: { id },
 		data: {
 			name: data.name,
 			description: data.description,
 			priceInCents: data.priceInCents,
-			collectionId: data.collectionId,
-			imagePath,
+			imagePath: imageUrl, // Save updated blob URL
 		},
 	});
 
-	// Revalidate paths and redirect
 	revalidatePath('/');
 	revalidatePath('/products');
+
+	// Redirect to the products admin page
 	redirect('/admin/products');
-}
-
-export async function toggleProductAvailability(
-	id: string,
-	isAvailable: boolean
-) {
-	await db.product.update({ where: { id }, data: { isAvailable } });
-
-	revalidatePath('/');
-	revalidatePath('/products');
 }
 
 export async function deleteProduct(id: string) {
 	const product = await db.product.delete({ where: { id } });
 
-	if (product == null) return notFound();
+	if (!product) return notFound();
 
-	// Delete the image from Blob Storage
-	await deleteBlob(product.imagePath);
+	// Delete image from blob storage
+	await del(product.imagePath, {
+		token: process.env.BLOB_READ_WRITE_TOKEN, // Authenticate deletion
+	});
 
 	revalidatePath('/');
 	revalidatePath('/products');
-}
-
-// Function to delete a blob from Blob Storage
-async function deleteBlob(imagePath: string) {
-	try {
-		// Use del method correctly
-		await del(imagePath, {
-			token: process.env.BLOB_READ_WRITE_TOKEN,
-		});
-	} catch (error) {
-		console.error('Error deleting blob:', error);
-	}
 }
