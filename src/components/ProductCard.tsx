@@ -32,6 +32,8 @@ export function ProductCard({
 				href={`/products/${id}/purchase`}
 				className='relative w-full h-96'
 			>
+				{imagePath}
+				<img src={imagePath} alt="" />
 				<Image
 					src={imagePath}
 					fill
