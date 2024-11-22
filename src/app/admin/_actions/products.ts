@@ -17,8 +17,9 @@ const imageSchema = fileSchema.refine(
 const addProductSchema = z.object({
 	name: z.string().min(1),
 	description: z.string().min(1),
-	priceInCents: z.number().positive(),
-	image: imageSchema, // Image file validation
+	priceInCents: z.coerce.number().int().min(1),
+	collectionId: z.string().optional(),
+	image: imageSchema.refine((file) => file.size > 0, 'Required'),
 });
 
 // Add a new product
