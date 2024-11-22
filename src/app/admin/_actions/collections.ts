@@ -2,9 +2,9 @@
 
 import db from '@/db/db';
 import { z } from 'zod';
-import fs from 'fs/promises';
 import { notFound, redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { put, del } from '@vercel/blob'; // Import Vercel Blob helpers
 
 // File schema for handling video uploads
 const fileSchema = z.instanceof(File, { message: 'File is required' });
@@ -30,16 +30,17 @@ export async function addCollection(prevState: unknown, formData: FormData) {
 
 	const data = result.data;
 
-	// Create directory if it doesn't exist
-	await fs.mkdir('public/collections', { recursive: true });
+	// Define unique blob key for the video
+	const videoKey = `collections/${crypto.randomUUID()}-${data.video.name}`;
 
-	// Define unique path for video
-	const videoPath = `/collections/${crypto.randomUUID()}-${data.video.name}`;
+	// Upload video to Vercel Blob Storage
 	const arrayBuffer = await data.video.arrayBuffer();
 	const uint8Array = new Uint8Array(arrayBuffer);
 
-	// Save video file
-	await fs.writeFile(`public${videoPath}`, uint8Array);
+	const { url: videoUrl } = await put(videoKey, uint8Array, {
+		access: 'public',
+		token: process.env.BLOB_READ_WRITE_TOKEN, // Use the blob token for authentication
+	});
 
 	// Create collection in the database
 	await db.collection.create({
@@ -48,7 +49,7 @@ export async function addCollection(prevState: unknown, formData: FormData) {
 			name: data.name,
 			description: data.description,
 			title: data.title,
-			videoPath,
+			videoPath: videoUrl, // Save blob URL instead of a file path
 		},
 	});
 
@@ -81,18 +82,28 @@ export async function updateCollection(
 	const collection = await db.collection.findUnique({ where: { id } });
 	if (!collection) return notFound();
 
-	let videoPath = collection.videoPath;
+	let videoUrl = collection.videoPath;
 
 	// Check if new video file is uploaded
 	if (data.video) {
-		// Remove old video file
-		await fs.unlink(`public${collection.videoPath}`);
+		// Delete the old video from blob storage
+		await del(collection.videoPath, {
+			token: process.env.BLOB_READ_WRITE_TOKEN, // Authenticate deletion
+		});
 
-		// Save new video file
-		videoPath = `/collections/${crypto.randomUUID()}-${data.video.name}`;
+		// Upload new video to blob storage
+		const newVideoKey = `collections/${crypto.randomUUID()}-${
+			data.video.name
+		}`;
 		const arrayBuffer = await data.video.arrayBuffer();
 		const uint8Array = new Uint8Array(arrayBuffer);
-		await fs.writeFile(`public${videoPath}`, uint8Array);
+
+		const { url } = await put(newVideoKey, uint8Array, {
+			access: 'public',
+			token: process.env.BLOB_READ_WRITE_TOKEN,
+		});
+
+		videoUrl = url; // Update video URL
 	}
 
 	// Update collection in the database
@@ -103,7 +114,7 @@ export async function updateCollection(
 			name: data.name,
 			description: data.description,
 			title: data.title,
-			videoPath,
+			videoPath: videoUrl, // Save updated blob URL
 		},
 	});
 
@@ -127,9 +138,12 @@ export async function toggleCollectionAvailability(
 export async function deleteCollection(id: string) {
 	const collection = await db.collection.delete({ where: { id } });
 
-	if (collection == null) return notFound();
+	if (!collection) return notFound();
 
-	await fs.unlink(`public${collection.videoPath}`);
+	// Delete video from blob storage
+	await del(collection.videoPath, {
+		token: process.env.BLOB_READ_WRITE_TOKEN, // Authenticate deletion
+	});
 
 	revalidatePath('/');
 	revalidatePath('/collections');
