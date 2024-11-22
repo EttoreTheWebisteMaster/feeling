@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import {
 	Card,
 	CardContent,
@@ -8,7 +9,6 @@ import {
 } from './ui/card';
 import { Button } from './ui/button';
 import Link from 'next/link';
-import Image from 'next/image';
 import ElegantButton from './ElegantButton';
 
 type ProductCardProps = {
@@ -32,11 +32,8 @@ export function ProductCard({
 				href={`/products/${id}/purchase`}
 				className='relative w-full h-96'
 			>
-				{imagePath}
-				<img src={imagePath} alt="" />
-				<Image
+				<img
 					src={imagePath}
-					fill
 					alt={name}
 					className='object-cover w-full h-96'
 				/>
