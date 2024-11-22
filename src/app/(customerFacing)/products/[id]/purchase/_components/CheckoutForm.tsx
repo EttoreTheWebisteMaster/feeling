@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,6 @@ import {
 	useStripe,
 } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import Image from 'next/image';
 import { FormEvent, useState } from 'react';
 
 type CheckoutFormProps = {
@@ -45,9 +45,8 @@ export function CheckoutForm({
 		<div className='max-w-5xl w-full mx-auto space-y-8'>
 			<div className='flex gap-4 items-center'>
 				<div className='aspect-video flex-shrink-0 w-1/3 relative'>
-					<Image
+					<img
 						src={product.imagePath}
-						fill
 						alt={product.name}
 						className='object-cover'
 					/>

@@ -9,7 +9,6 @@ import { useState } from 'react';
 import { addProduct, updateProduct } from '../../_actions/products';
 import { useFormState, useFormStatus } from 'react-dom';
 import { Product, Collection } from '@prisma/client';
-import Image from 'next/image';
 import {
 	Select,
 	SelectContent,
@@ -117,7 +116,7 @@ export function ProductForm({
 					required={product == null}
 				/>
 				{product != null && (
-					<Image
+					<img
 						src={product.imagePath}
 						height='400'
 						width='400'

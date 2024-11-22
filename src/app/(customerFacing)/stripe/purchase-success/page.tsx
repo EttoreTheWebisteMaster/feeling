@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button"
 import db from "@/db/db"
 import { formatCurrency } from "@/lib/formatters"
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import Stripe from "stripe"
@@ -32,9 +31,8 @@ export default async function SuccessPage({
 			</h1>
 			<div className='flex gap-4 items-center'>
 				<div className='aspect-video flex-shrink-0 w-1/3 relative'>
-					<Image
+					<img
 						src={product.imagePath}
-						fill
 						alt={product.name}
 						className='object-cover'
 					/>
