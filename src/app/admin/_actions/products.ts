@@ -132,6 +132,16 @@ export async function updateProduct(
 	redirect('/admin/products');
 }
 
+export async function toggleProductAvailability(
+	id: string,
+	isAvailable: boolean
+) {
+	await db.product.update({ where: { id }, data: { isAvailable } });
+
+	revalidatePath('/');
+	revalidatePath('/products');
+}
+
 export async function deleteProduct(id: string) {
 	const product = await db.product.delete({ where: { id } });
 
