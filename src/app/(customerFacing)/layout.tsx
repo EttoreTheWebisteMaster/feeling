@@ -28,7 +28,20 @@ export default function Layout({
 				</NavCollapse>
 				<NavLink href='/products'>Products</NavLink>
 				<NavLink href='/orders'>My Orders</NavLink>
-				<NavLink href='/support'>Support</NavLink>
+				<NavCollapse title='Support'>
+					<SubNavLink
+						href='https://wa.me/393444144444?text=Feeling%20support%20chat'
+						target='_blank'
+					>
+						Whatsapp chat
+					</SubNavLink>
+					<SubNavLink
+						href='mailto:feeling.streetwear.brand@gmail.com'
+						target='_blank'
+					>
+						Contact us
+					</SubNavLink>
+				</NavCollapse>
 			</Nav>
 			<div className='container text-center place-content-center px-0 my-16 lg:px-48 md:px-24'>
 				{children}
