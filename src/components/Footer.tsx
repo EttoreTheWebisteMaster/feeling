@@ -29,7 +29,7 @@ export default function Footer() {
 				</Link>
 			</div>
 			<div className='h-16 bigText uppercase text-7xl relative'>
-				<div className='absolute' style={{ bottom: '-80px' }}>
+				<div className='absolute flex justify-center w-full' style={{ bottom: '-85px' }}>
 					Feeling
 				</div>
 			</div>
