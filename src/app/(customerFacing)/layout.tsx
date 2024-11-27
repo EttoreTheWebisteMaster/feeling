@@ -1,4 +1,4 @@
-import { Nav, NavLink, SubNavLink, NavCollapse } from '@/components/ClientNav';
+import { Nav, NavLink, SubNavLink, NavCollapse } from '@/components/Nav';
 import Footer from '@/components/Footer';
 
 export const dynamic = 'force-dynamic';
@@ -30,7 +30,7 @@ export default function Layout({
 				<NavLink href='/orders'>My Orders</NavLink>
 				<NavLink href='/support'>Support</NavLink>
 			</Nav>
-			<div className='text-center place-content-center my-16'>
+			<div className='container text-center place-content-center px-0 my-16 lg:px-48 md:px-24'>
 				{children}
 			</div>
 			<Footer />

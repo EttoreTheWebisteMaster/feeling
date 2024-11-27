@@ -30,18 +30,14 @@ export function ProductCard({
 		<div className='flex justify-center'>
 			<Link
 				href={`/products/${id}/purchase`}
-				className='relative w-full h-96'
+				className='relative h-96 aspect-w-1 aspect-h-1'
 			>
-				<img
-					src={imagePath}
-					alt={name}
-					className='object-cover w-full h-96'
-				/>
+				<img src={imagePath} alt={name} className='object-cover h-96' />
 				<div
 					className='absolute text-white w-full'
 					style={{ bottom: '24px' }}
 				>
-					<div className='uppercase text-6xl drop-shadow-md bigText'>
+					<div className='uppercase text-6xl drop-shadow-md bigText truncate ... whitespace-break-spaces'>
 						{name}
 					</div>
 					<ElegantButton text='Order now' />
