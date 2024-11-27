@@ -4,7 +4,7 @@ import db from '@/db/db';
 import { z } from 'zod';
 import { notFound, redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { del, put } from '@vercel/blob'; // Ensure correct import
+import { put, del } from '@vercel/blob'; // Ensure correct import
 
 const fileSchema = z.instanceof(File, { message: 'Required' });
 const imageSchema = fileSchema.refine(
@@ -27,13 +27,16 @@ export async function addProduct(prevState: unknown, formData: FormData) {
 
 	const data = result.data;
 
-	// Generate unique image path
+	// Generate unique image path for the product image
 	const imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`;
 
 	// Upload the image to Blob Storage
-	await put(imagePath, data.image.stream(), {
+	const arrayBuffer = await data.image.arrayBuffer();
+	const uint8Array = new Uint8Array(arrayBuffer);
+
+	const { url: imageUrl } = await put(imagePath, uint8Array, {
 		access: 'public',
-		token: process.env.BLOB_READ_WRITE_TOKEN,
+		token: process.env.BLOB_READ_WRITE_TOKEN, // Use the correct token for authentication
 	});
 
 	// Store product in the database
@@ -45,7 +48,7 @@ export async function addProduct(prevState: unknown, formData: FormData) {
 			description: data.description,
 			priceInCents: data.priceInCents,
 			collectionId: data.collectionId,
-			imagePath,
+			imagePath: imageUrl, // Save the blob URL instead of just the file path
 			imagePath1: '',
 			imagePath2: '',
 			imagePath3: '',
@@ -84,15 +87,22 @@ export async function updateProduct(
 
 	// Update the image if a new one is provided
 	if (data.image != null && data.image.size > 0) {
-		// Delete old image from Blob Storage
+		// Delete the old image from Blob Storage
 		await deleteBlob(product.imagePath);
 
-		// Upload the new image to Blob Storage
+		// Generate a new unique image path
 		imagePath = `/products/${crypto.randomUUID()}-${data.image.name}`;
-		await put(imagePath, data.image.stream(), {
+
+		// Upload the new image to Blob Storage
+		const arrayBuffer = await data.image.arrayBuffer();
+		const uint8Array = new Uint8Array(arrayBuffer);
+
+		const { url: imageUrl } = await put(imagePath, uint8Array, {
 			access: 'public',
-			token: process.env.BLOB_READ_WRITE_TOKEN,
+			token: process.env.BLOB_READ_WRITE_TOKEN, // Ensure correct token for authentication
 		});
+
+		imagePath = imageUrl; // Update to the new image URL
 	}
 
 	// Update the product in the database
@@ -138,7 +148,7 @@ export async function deleteProduct(id: string) {
 // Function to delete a blob from Blob Storage
 async function deleteBlob(imagePath: string) {
 	try {
-		// Use del method correctly
+		// Use the correct method to delete the image
 		await del(imagePath, {
 			token: process.env.BLOB_READ_WRITE_TOKEN,
 		});
