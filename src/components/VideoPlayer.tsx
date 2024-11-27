@@ -9,10 +9,10 @@ export default function VideoPlayer({
 			<div className='relative overflow-hidden'>
 				<video
 					src={videoPath}
-					/* autoPlay
+					autoPlay
 					loop
 					muted
-					playsInline */
+					playsInline
 					style={{ width: '100%', height: 'auto' }}
 				>
 					Your browser does not support the video tag.
