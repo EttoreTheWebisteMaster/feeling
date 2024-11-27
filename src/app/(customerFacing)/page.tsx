@@ -75,8 +75,8 @@ function ProductGridSection({
 	title,
 }: Readonly<ProductGridSectionProps>) {
 	return (
-		<div className='space-y-4'>
-			<div className='grid grid-cols-1 gap-3 px-2'>
+		<div className='space-y-4 flex justify-center'>
+			<div className='grid grid-cols-1 lg:grid-cols-2 gap-3 px-2'>
 				<Suspense
 					fallback={
 						<>
@@ -85,9 +85,8 @@ function ProductGridSection({
 							<ProductCardSkeleton />
 						</>
 					}
-				>
-				</Suspense>
-					<ProductSuspense productsFetcher={productsFetcher} />
+				></Suspense>
+				<ProductSuspense productsFetcher={productsFetcher} />
 			</div>
 		</div>
 	);
