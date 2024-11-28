@@ -119,7 +119,7 @@ export function ProductPage({ product }: Readonly<ProductPageProps>) {
 					</Button>
 					<Link
 						className='mt-4'
-						href=''
+						href='https://wa.me/393444144444?text=Feeling%20support%20chat'
 					>
 						Contact support
 					</Link>
