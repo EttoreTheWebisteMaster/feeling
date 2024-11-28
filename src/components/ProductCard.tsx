@@ -1,13 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from './ui/card';
-import { Button } from './ui/button';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import ElegantButton from './ElegantButton';
 
@@ -19,6 +11,50 @@ type ProductCardProps = {
 	imagePath: string;
 };
 
+// Resource Cache
+const imageCache = new Map<string, Promise<HTMLImageElement>>();
+
+// Function to load image
+async function loadImage(src: string): Promise<HTMLImageElement> {
+	if (imageCache.has(src)) {
+		return imageCache.get(src) as Promise<HTMLImageElement>;
+	}
+
+	const promise = new Promise<HTMLImageElement>((resolve, reject) => {
+		const img = new Image();
+		img.src = src;
+		img.onload = () => resolve(img);
+		img.onerror = (err) => reject(err);
+	});
+
+	imageCache.set(src, promise);
+	return promise;
+}
+
+// Custom Hook
+function useImageResource(src: string) {
+	const resource = React.useMemo(
+		() => ({
+			read: () => {
+				if (!imageCache.has(src)) {
+					throw loadImage(src);
+				}
+			},
+		}),
+		[src]
+	);
+
+	return resource;
+}
+
+// Product Image Component
+function ProductImage({ src, alt }: Readonly<{ src: string; alt: string }>) {
+	const resource = useImageResource(src);
+	resource.read(); // Read from cache or trigger loading
+	return <img src={src} alt={alt} className='object-cover h-96' />;
+}
+
+// Product Card Component
 export function ProductCard({
 	id,
 	name,
@@ -32,12 +68,14 @@ export function ProductCard({
 				href={`/products/${id}/purchase`}
 				className='relative h-96 aspect-w-1 aspect-h-1'
 			>
-				<img src={imagePath} alt={name} className='object-cover h-96' />
+				<Suspense fallback={<ProductCardSkeleton />}>
+					<ProductImage src={imagePath} alt={name} />
+				</Suspense>
 				<div
 					className='absolute text-white w-full'
 					style={{ bottom: '24px' }}
 				>
-					<div className='uppercase text-6xl drop-shadow-md bigText truncate ... whitespace-break-spaces'>
+					<div className='uppercase text-6xl drop-shadow-md bigText truncate whitespace-break-spaces'>
 						{name}
 					</div>
 					<ElegantButton text='Order now' />
@@ -47,26 +85,11 @@ export function ProductCard({
 	);
 }
 
+// Skeleton Loader
 export function ProductCardSkeleton() {
 	return (
-		<Card className='overflow-hidden flex flex-col animate-pulse'>
-			<div className='w-full aspect-video bg-gray-300' />
-			<CardHeader>
-				<CardTitle>
-					<div className='w-3/4 h-6 rounded-full bg-gray-300' />
-				</CardTitle>
-				<CardDescription>
-					<div className='w-1/2 h-4 rounded-full bg-gray-300' />
-				</CardDescription>
-			</CardHeader>
-			<CardContent className='space-y-2'>
-				<div className='w-full h-4 rounded-full bg-gray-300' />
-				<div className='w-full h-4 rounded-full bg-gray-300' />
-				<div className='w-3/4 h-4 rounded-full bg-gray-300' />
-			</CardContent>
-			<CardFooter>
-				<Button className='w-full' disabled size='lg'></Button>
-			</CardFooter>
-		</Card>
+		<div className='flex justify-center'>
+			<div className='bg-gray-300 animate-pulse h-96 w-96 aspect-w-1 aspect-h-1'></div>
+		</div>
 	);
 }

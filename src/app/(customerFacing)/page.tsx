@@ -83,10 +83,12 @@ function ProductGridSection({
 							<ProductCardSkeleton />
 							<ProductCardSkeleton />
 							<ProductCardSkeleton />
+							<ProductCardSkeleton />
 						</>
 					}
-				></Suspense>
-				<ProductSuspense productsFetcher={productsFetcher} />
+				>
+					<ProductSuspense productsFetcher={productsFetcher} />
+				</Suspense>
 			</div>
 		</div>
 	);

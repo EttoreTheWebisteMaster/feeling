@@ -12,26 +12,26 @@ const getProducts = cache(() => {
 
 export default function ProductsPage() {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <Suspense
-        fallback={
-          <>
-            <ProductCardSkeleton />
-            <ProductCardSkeleton />
-            <ProductCardSkeleton />
-            <ProductCardSkeleton />
-            <ProductCardSkeleton />
-            <ProductCardSkeleton />
-          </>
-        }
-      >
-        <ProductsSuspense />
-      </Suspense>
-    </div>
-  )
+		<div className='space-y-4 flex justify-center'>
+			<div className='grid grid-cols-1 lg:grid-cols-2 gap-3 px-2'>
+				<Suspense
+					fallback={
+						<>
+							<ProductCardSkeleton />
+							<ProductCardSkeleton />
+							<ProductCardSkeleton />
+							<ProductCardSkeleton />
+						</>
+					}
+				>
+				  <ProductSuspense />
+        </Suspense>
+			</div>
+		</div>
+  );
 }
 
-async function ProductsSuspense() {
+async function ProductSuspense() {
   const products = await getProducts()
 
   return products.map(product => <ProductCard key={product.id} {...product} />)
