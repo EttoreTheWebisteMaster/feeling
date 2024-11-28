@@ -35,7 +35,9 @@ export function Nav({ children }: Readonly<{ children: ReactNode }>) {
 			</button>
 
 			{/* Brand or title */}
-			<Link className='bigText text-2xl' href='/'>FEELING</Link>
+			<Link className='bigText text-2xl' href='/'>
+				FEELING
+			</Link>
 
 			{/* Cart */}
 			<button
@@ -137,7 +139,7 @@ export function NavCollapse({
 					isOpen ? 'max-h-screen' : 'max-h-0'
 				)}
 			>
-        <div className='py-2'></div>
+				<div className='py-0.5'></div>
 				{/* Pass closeMenu to SubNavLinks */}
 				{React.Children.map(children, (child) =>
 					isValidElement(child)
