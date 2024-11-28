@@ -75,7 +75,7 @@ export function ProductPage({ product }: Readonly<ProductPageProps>) {
 			{/* Product Information */}
 			<div className='text-center space-y-4'>
 				<h1 className='text-3xl font-bold'>{name}</h1>
-				<p className='text-lg text-gray-600'>
+				<p className='text-lg text-gray-600' style={{ margin: 0 }}>
 					{formatCurrency(product.priceInCents / 100)}
 				</p>
 

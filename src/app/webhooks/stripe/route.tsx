@@ -29,7 +29,14 @@ export async function POST(req: NextRequest) {
 
 		const userFields = {
 			email,
-			orders: { create: { productId, pricePaidInCents } },
+			orders: {
+				create: {
+					productId,
+					pricePaidInCents,
+					size: charge.metadata.size,
+					quantity: parseInt(charge.metadata.quantity, 10),
+				},
+			},
 		};
 		const {
 			orders: [order],

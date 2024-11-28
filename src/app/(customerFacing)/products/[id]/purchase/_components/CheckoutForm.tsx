@@ -48,7 +48,7 @@ export function CheckoutForm({
 	quantity,
 	clientSecret,
 }: Readonly<CheckoutFormProps>) {
-	const name = product.collection?.name +' '+ product.name;
+	const name = product.collection?.name +' '+ product.name + ' - ' + size;
 
 	return (
 		<div className='max-w-5xl w-full mx-auto space-y-8'>
@@ -76,6 +76,8 @@ export function CheckoutForm({
 				<Form
 					priceInCents={product.priceInCents * quantity}
 					productId={product.id}
+					size={size}
+					quantity={quantity}
 				/>
 			</Elements>
 		</div>
@@ -85,9 +87,13 @@ export function CheckoutForm({
 function Form({
 	priceInCents,
 	productId,
+	size,
+	quantity,
 }: Readonly<{
 	priceInCents: number;
 	productId: string;
+	size: string;
+	quantity: number;
 }>) {
 	const stripe = useStripe();
 	const elements = useElements();
