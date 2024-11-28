@@ -58,7 +58,7 @@ export function Nav({ children }: Readonly<{ children: ReactNode }>) {
 					✕
 				</button>
 				{/* Pass closeMenu to children */}
-				<div className='px-8 space-y-6'>
+				<div className='px-5 space-y-3'>
 					{React.Children.map(children, (child) =>
 						isValidElement(child)
 							? cloneElement(
