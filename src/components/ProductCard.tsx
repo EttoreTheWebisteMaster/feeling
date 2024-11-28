@@ -65,7 +65,7 @@ export function ProductCard({
 	return (
 		<div className='flex justify-center'>
 			<Link
-				href={`/products/${id}/purchase`}
+				href={`/products/${id}`}
 				className='relative h-96 aspect-w-1 aspect-h-1'
 			>
 				<Suspense fallback={<ProductCardSkeleton />}>

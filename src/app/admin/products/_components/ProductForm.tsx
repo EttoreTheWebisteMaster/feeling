@@ -16,6 +16,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
+import Link from 'next/link';
 
 export function ProductForm({
 	product,
@@ -108,7 +109,7 @@ export function ProductForm({
 			</div>
 			{html_input}
 			<div className='space-y-2'>
-				<Label htmlFor='image'>Image</Label>
+				<Label htmlFor='image'>Cover Image</Label>
 				<Input
 					type='file'
 					id='image'
@@ -127,6 +128,106 @@ export function ProductForm({
 					<div className='text-destructive'>{error.image}</div>
 				)}
 			</div>
+			<div className='space-y-2'>
+				<Label htmlFor='image'>Image 1</Label>
+				<Input
+					type='file'
+					id='image1'
+					name='image1'
+					required={product == null}
+				/>
+				{product != null && (
+					<img
+						src={product.imagePath1}
+						height='400'
+						width='400'
+						alt='Product Image'
+					/>
+				)}
+				{error.image1 && (
+					<div className='text-destructive'>{error.image1}</div>
+				)}
+			</div>
+			<div className='space-y-2'>
+				<Label htmlFor='image'>Image 2</Label>
+				<Input
+					type='file'
+					id='image2'
+					name='image2'
+				/>
+				{product != null && (
+					<img
+						src={product.imagePath2}
+						height='400'
+						width='400'
+						alt='Product Image'
+					/>
+				)}
+				{error.image2 && (
+					<div className='text-destructive'>{error.image2}</div>
+				)}
+			</div>
+			<div className='space-y-2'>
+				<Label htmlFor='image'>Image 3</Label>
+				<Input
+					type='file'
+					id='image3'
+					name='image3'
+				/>
+				{product != null && (
+					<img
+						src={product.imagePath3}
+						height='400'
+						width='400'
+						alt='Product Image'
+					/>
+				)}
+				{error.image3 && (
+					<div className='text-destructive'>{error.image3}</div>
+				)}
+			</div>
+			<div className='space-y-2'>
+				<Label htmlFor='image'>Image 4</Label>
+				<Input
+					type='file'
+					id='image4'
+					name='image4'
+				/>
+				{product != null && (
+					<img
+						src={product.imagePath4}
+						height='400'
+						width='400'
+						alt='Product Image'
+					/>
+				)}
+				{error.image4 && (
+					<div className='text-destructive'>{error.image4}</div>
+				)}
+			</div>
+			<div className='space-y-2'>
+				<Label htmlFor='image'>Image 5</Label>
+				<Input
+					type='file'
+					id='image5'
+					name='image5'
+				/>
+				{product != null && (
+					<img
+						src={product.imagePath4}
+						height='400'
+						width='400'
+						alt='Product Image'
+					/>
+				)}
+				{error.image5 && (
+					<div className='text-destructive'>{error.image5}</div>
+				)}
+			</div>
+			<Button className='bg-red-500 hover:bg-red-400'>
+				<Link href='/admin/products'>Cancel</Link>
+			</Button>
+			&nbsp;
 			<SubmitButton />
 		</form>
 	);

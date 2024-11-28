@@ -5,6 +5,7 @@ import db from '@/db/db';
 import { cache } from '@/lib/cache';
 import { Collection, Product } from '@prisma/client';
 import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
 
 // Fetch and cache the collection for use on the homepage
 const getCollection = cache(
@@ -20,6 +21,8 @@ const getCollection = cache(
 const getProducts = cache(
 	async (collectionId: string) => {
 		const collection = await getCollection(collectionId);
+
+        if (collection == null) return notFound();
 
 		// If there's no available collection, return an empty array
 		if (!collection) return [];

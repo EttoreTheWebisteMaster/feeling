@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { addCollection, updateCollection } from '../../_actions/collections';
 import { useFormState, useFormStatus } from 'react-dom';
 import { Collection } from '@prisma/client';
+import Link from 'next/link';
 
 export function CollectionForm({
 	collection,
@@ -36,6 +37,19 @@ export function CollectionForm({
 				)}
 			</div>
 			<div className='space-y-2'>
+				<Label htmlFor='title'>Title</Label>
+				<Input
+					type='text'
+					id='title'
+					name='title'
+					required
+					defaultValue={collection?.title}
+				/>
+				{error.title && (
+					<div className='text-destructive'>{error.title}</div>
+				)}
+			</div>
+			<div className='space-y-2'>
 				<Label htmlFor='description'>Description</Label>
 				<Textarea
 					id='description'
@@ -45,18 +59,6 @@ export function CollectionForm({
 				/>
 				{error.description && (
 					<div className='text-destructive'>{error.description}</div>
-				)}
-			</div>
-			<div className='space-y-2'>
-				<Label htmlFor='title'>Title</Label>
-				<Textarea
-					id='title'
-					name='title'
-					required
-					defaultValue={collection?.title}
-				/>
-				{error.title && (
-					<div className='text-destructive'>{error.title}</div>
 				)}
 			</div>
 			<div className='space-y-2'>
@@ -76,6 +78,10 @@ export function CollectionForm({
 					<div className='text-destructive'>{error.video}</div>
 				)}
 			</div>
+			<Button className='bg-red-500 hover:bg-red-400'>
+				<Link href='/admin/collections'>Cancel</Link>
+			</Button>
+			&nbsp;
 			<SubmitButton />
 		</form>
 	);
