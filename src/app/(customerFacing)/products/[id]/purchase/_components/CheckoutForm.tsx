@@ -30,6 +30,8 @@ type CheckoutFormProps = {
 		priceInCents: number;
 		description: string;
 	};
+	size: string;
+	quantity: number;
 	clientSecret: string;
 };
 
@@ -39,10 +41,12 @@ const stripePromise = loadStripe(
 
 export function CheckoutForm({
 	product,
+	size,
+	quantity,
 	clientSecret,
 }: Readonly<CheckoutFormProps>) {
 	return (
-		<div className='max-w-5xl w-full mx-auto space-y-8'>
+		<div className='max-w-5xl w-full mx-auto space-y-8 container'>
 			<div className='flex gap-4 items-center'>
 				<div className='aspect-video flex-shrink-0 w-1/3 relative'>
 					<img
@@ -51,19 +55,23 @@ export function CheckoutForm({
 						className='object-cover'
 					/>
 				</div>
-				<div>
-					<div className='text-lg'>
-						{formatCurrency(product.priceInCents / 100)}
+				<div className='px-8'>
+					<div className='flex justify-between'>
+						<h1 className='text-2xl font-bold'>{product.name}</h1>
+						<div className='text-lg'>
+							{quantity} x{' '}
+							{formatCurrency(product.priceInCents / 100)}
+						</div>
 					</div>
-					<h1 className='text-2xl font-bold'>{product.name}</h1>
-					<div className='line-clamp-3 text-muted-foreground'>
+
+					<div className='line-clamp-3 text-muted-foreground text-left'>
 						{product.description}
 					</div>
 				</div>
 			</div>
 			<Elements options={{ clientSecret }} stripe={stripePromise}>
 				<Form
-					priceInCents={product.priceInCents}
+					priceInCents={product.priceInCents * quantity}
 					productId={product.id}
 				/>
 			</Elements>
@@ -130,9 +138,7 @@ function Form({
 						/>
 					</div>
 					<div className='mt-4'>
-						<AddressElement
-							options={{ mode: 'shipping' }}
-						/>
+						<AddressElement options={{ mode: 'shipping' }} />
 					</div>
 				</CardContent>
 				<CardFooter>

@@ -111,13 +111,15 @@ export function ProductPage({ product }: Readonly<ProductPageProps>) {
 				{/* Checkout Button */}
 				<div className='flex flex-col items-center pt-8'>
 					<Button className='mt-4 w-72' size='lg' asChild>
-						<Link href={`/products/${product.id}/purchase`}>
+						<Link
+							href={`/products/${product.id}/purchase?size=${size}&quantity=${quantity}`}
+						>
 							Checkout
 						</Link>
 					</Button>
 					<Link
 						className='mt-4'
-						href={`/products/${product.id}/purchase`}
+						href=''
 					>
 						Contact support
 					</Link>
