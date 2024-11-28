@@ -23,6 +23,9 @@ interface ProductPageProps {
 		imagePath4: string;
 		imagePath5: string;
 		description: string;
+		collection: {
+			name: string;
+		} | null;
 	};
 }
 
@@ -38,10 +41,12 @@ export function ProductPage({ product }: Readonly<ProductPageProps>) {
 		setQuantity((prevQuantity) => Math.max(1, prevQuantity + delta));
 	};
 
+	const name = product.collection?.name + ' ' + product.name;
+
 	return (
 		<div className='container mx-auto p-4 space-y-8'>
 			{/* Carousel with Product Images */}
-			<Carousel className='w-96 h-96 mx-auto'>
+			<Carousel className='w-48 h-48 md:w-96 md:h-96 mx-auto'>
 				<CarouselContent className='h-96'>
 					{[
 						product.imagePath1,
@@ -56,7 +61,7 @@ export function ProductPage({ product }: Readonly<ProductPageProps>) {
 								<img
 									src={path}
 									alt={`Image ${index + 1} of ${
-										product.name
+										name
 									}`}
 									className='object-cover'
 								/>
@@ -69,7 +74,7 @@ export function ProductPage({ product }: Readonly<ProductPageProps>) {
 
 			{/* Product Information */}
 			<div className='text-center space-y-4'>
-				<h1 className='text-3xl font-bold'>{product.name}</h1>
+				<h1 className='text-3xl font-bold'>{name}</h1>
 				<p className='text-lg text-gray-600'>
 					{formatCurrency(product.priceInCents / 100)}
 				</p>
@@ -120,6 +125,7 @@ export function ProductPage({ product }: Readonly<ProductPageProps>) {
 					<Link
 						className='mt-4'
 						href='https://wa.me/393444144444?text=Feeling%20support%20chat'
+						target='_blank'
 					>
 						Contact support
 					</Link>
@@ -127,7 +133,7 @@ export function ProductPage({ product }: Readonly<ProductPageProps>) {
 			</div>
 
 			{/* Product Description */}
-			<div className='prose mx-auto w-96 py-24'>
+			<div className='prose mx-auto px-12 py-16'>
 				<h2 className='text-xl font-semibold pb-4'>
 					Product Description
 				</h2>

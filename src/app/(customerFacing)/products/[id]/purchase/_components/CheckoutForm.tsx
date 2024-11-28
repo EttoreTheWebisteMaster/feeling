@@ -29,6 +29,9 @@ type CheckoutFormProps = {
 		name: string;
 		priceInCents: number;
 		description: string;
+		collection: {
+			name: string;
+		} | null;
 	};
 	size: string;
 	quantity: number;
@@ -45,26 +48,26 @@ export function CheckoutForm({
 	quantity,
 	clientSecret,
 }: Readonly<CheckoutFormProps>) {
+	const name = product.collection?.name +' '+ product.name;
+
 	return (
-		<div className='max-w-5xl w-full mx-auto space-y-8 container'>
-			<div className='flex gap-4 items-center'>
+		<div className='max-w-5xl w-full mx-auto space-y-8'>
+			<div className='flex gap-4 items-center container'>
 				<div className='aspect-video flex-shrink-0 w-1/3 relative'>
 					<img
 						src={product.imagePath}
-						alt={product.name}
+						alt={name}
 						className='object-cover'
 					/>
 				</div>
-				<div className='px-8'>
-					<div className='flex justify-between'>
-						<h1 className='text-2xl font-bold'>{product.name}</h1>
-						<div className='text-lg'>
-							{quantity} x{' '}
-							{formatCurrency(product.priceInCents / 100)}
-						</div>
+				<div className='px-8 text-left'>
+					<h1 className='text-2xl font-bold'>{name}</h1>
+					<div className='text-lg'>
+						{quantity} x{' '}
+						{formatCurrency(product.priceInCents / 100)}
 					</div>
 
-					<div className='line-clamp-3 text-muted-foreground text-left'>
+					<div className='line-clamp-3 text-muted-foreground'>
 						{product.description}
 					</div>
 				</div>

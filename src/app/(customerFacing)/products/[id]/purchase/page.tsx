@@ -12,7 +12,16 @@ export default async function PurchasePage({
 	params: { id: string };
 	searchParams: { size: string; quantity: string };
 }>) {
-	const product = await db.product.findUnique({ where: { id } });
+	const product = await db.product.findUnique({
+		where: { id },
+		include: {
+			collection: {
+				select: {
+					name: true,
+				},
+			},
+		},
+	});
 	if (product == null) return notFound();
 
 	// Get the size and quantity from the searchParams

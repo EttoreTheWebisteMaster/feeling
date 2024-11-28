@@ -4,7 +4,16 @@ import db from '@/db/db';
 
 // Fetch product data server-side
 async function fetchProduct(id: string) {
-	const product = await db.product.findUnique({ where: { id } });
+	const product = await db.product.findUnique({
+		where: { id },
+		include: {
+			collection: {
+				select: {
+					name: true,
+				},
+			},
+		},
+	});
 	return product;
 }
 
