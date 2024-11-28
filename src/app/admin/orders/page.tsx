@@ -80,7 +80,7 @@ async function OrdersTable() {
 							)}
 						</TableCell>
 						<TableCell>
-							{order.product.collection.name} {order.product.name}
+							{order.product.collection?.name} {order.product.name}
 						</TableCell>
 						<TableCell>{order.user.email}</TableCell>
 						<TableCell>
